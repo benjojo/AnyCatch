@@ -84,6 +84,9 @@ func main() {
 				// 	Seq      uint16
 				// 	Data     []byte
 				// }
+				argh := pkt.Headers[1].(pcap.Icmphdr)
+				log.Printf("ICMP! %d %d %d %d %d", argh.Type, argh.Code, argh.Checksum, argh.Id, argh.Seq)
+
 				for level, headerr := range pkt.Headers {
 					switch header := headerr.(type) {
 					case pcap.Icmphdr:
