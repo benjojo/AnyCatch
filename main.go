@@ -85,14 +85,12 @@ func main() {
 				// 	Seq      uint16
 				// 	Data     []byte
 				// }
-				icmppkt := pkt.Payload
-				icmp := new(pcap.Icmphdr)
-				icmp.Type = icmppkt[0]
-				icmp.Code = icmppkt[1]
-				icmp.Checksum = binary.BigEndian.Uint16(icmppkt[2:4])
-				icmp.Id = binary.BigEndian.Uint16(icmppkt[4:6])
-				icmp.Seq = binary.BigEndian.Uint16(icmppkt[6:8])
-				log.Printf("What ICMP! %d %d %d %d %d", icmp.Type, icmp.Code, icmp.Checksum, icmp.Id, icmp.Seq)
+				for level, header := range pkt.Headers {
+					switch header := value.(type) {
+					case pcap.Icmphdr:
+						log.Printf("What ICMP! %d %d %d %d %d", header.Type, header.Code, header.Checksum, header.Id, header.Seq)
+					}
+				}
 			}
 		}
 		out.Flush()
