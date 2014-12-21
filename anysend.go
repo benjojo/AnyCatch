@@ -48,12 +48,16 @@ func main() {
 
 	packet[0] = 8 // Type, in this case a echo request
 	packet[1] = 0 // Code, in this case there is no sub code for this packet type
-	/* packet[2-3] = checksum of packet, we will do this later when we are done */
+
+	packet[2] = 0 // checksum of packet, we will do this later when we are done
+	packet[3] = 0 // checksum of packet, we will do this later when we are done
+
 	packet[4] = 69 // ICMP ID of the request, in this case I am just filling this in
 	packet[5] = 69 // ICMP ID of the request
+
 	packet[6] = 69 // ICMP Seq of the request, in this case I am just filling this in
 	packet[7] = 69 // ICMP Seq of the request
-	// ANYCATCH
+
 	for i := 0; i < len(payload); i++ {
 		packet[8+i] = payload[i]
 	}
