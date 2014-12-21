@@ -44,7 +44,7 @@ func main() {
 	// return icmp
 
 	payload := []byte("ANYCATCH")
-	packet := make([]byte, 7+len(payload)) // 7 for the packet itself, 8 for the "ANYCATCH" string
+	packet := make([]byte, 7+len(payload)+1) // 7 for the packet itself, 8 for the "ANYCATCH" string
 
 	packet[0] = 8 // Type, in this case a echo request
 	packet[1] = 0 // Code, in this case there is no sub code for this packet type
