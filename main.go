@@ -28,13 +28,14 @@ func main() {
 
 	var device *string = flag.String("i", "", "interface")
 	var snaplen *int = flag.Int("s", 65535, "snaplen")
+	var anycastIP *string = flag.String("a", "1.2.3.4", "anycastip")
 	expr := ""
 
 	out = bufio.NewWriter(os.Stdout)
 	errout = bufio.NewWriter(os.Stderr)
 
 	flag.Usage = func() {
-		fmt.Fprintf(errout, "usage: %s [ -i interface ] [ -s snaplen ] [ -X ] [ expression ]\n", os.Args[0])
+		fmt.Fprintf(errout, "usage: %s [ -i interface ] [ -a anycastip ] [ -s snaplen ] [ -X ] [ expression ]\n", os.Args[0])
 		os.Exit(1)
 	}
 
@@ -42,6 +43,13 @@ func main() {
 
 	if len(flag.Args()) > 0 {
 		expr = flag.Arg(0)
+	}
+
+	var incomingIP net.IP = net.ParseIP(*anycastIP)
+
+	if incomingIP == nil {
+		fmt.Fprintf(errout, "Incorrect Anycast IP given")
+		flag.Usage()
 	}
 
 	if *device == "" {
@@ -74,7 +82,7 @@ func main() {
 	for pkt := h.Next(); pkt != nil; pkt = h.Next() {
 		pkt.Decode()
 		if pkt.IP != nil {
-			if pkt.IP.Protocol == 1 {
+			if pkt.IP.Protocol == 1 && net.IP(pkt.IP.SrcIP).String() == incomingIP.String() {
 
 				// 	type Icmphdr struct {
 				// 	Type     uint8
@@ -88,7 +96,9 @@ func main() {
 				for level, headerr := range pkt.Headers {
 					switch header := headerr.(type) {
 					case *pcap.Icmphdr:
-						log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
+						if header.Type == 8 {
+							log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
+						}
 					case *pcap.Iphdr:
 						//log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
 					default:
