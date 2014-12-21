@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"flag"
 	"log"
 	"net"
@@ -61,7 +63,7 @@ func main() {
 	for i := 0; i < len(payload); i++ {
 		packet[8+i] = payload[i]
 	}
-	csum := checkSum(packet)
+	csum, _ := getChecksum(packet)
 	packet[2] = byte(csum >> 8)
 	packet[3] = byte(csum & 255)
 
@@ -70,14 +72,36 @@ func main() {
 
 }
 
-func checkSum(msg []byte) uint16 {
-	sum := 0
-	// assume even for now
-	for n := 1; n < len(msg)-1; n += 2 {
-		sum += int(msg[n])*256 + int(msg[n+1])
+func getChecksum(data []byte) (uint16, error) {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return 0, err
 	}
-	sum = (sum >> 16) + (sum & 0xffff)
-	sum += (sum >> 16)
-	var answer uint16 = uint16(^sum)
-	return answer
+	arr := append(buf.Bytes(), data...)
+
+	var sum uint32
+	countTo := (len(arr) / 2) * 2
+
+	// Sum as if we were iterating over uint16's
+	for i := 0; i < countTo; i += 2 {
+		p1 := (uint32)(arr[i+1]) * 256
+		p2 := (uint32)(arr[i])
+		sum += p1 + p2
+	}
+
+	// Potentially sum the last byte
+	if countTo < len(arr) {
+		sum += (uint32)(arr[len(arr)-1])
+	}
+
+	// Fold into 16 bits.
+	sum = (sum >> 16) + (sum & 0xFFFF)
+	sum = sum + (sum >> 16)
+
+	// Take the 1's complement, and swap bytes.
+	answer := ^((uint16)(sum & 0xFFFF))
+	answer = (answer >> 8) | ((answer << 8) & 0xFF00)
+
+	return answer, nil
 }
