@@ -47,7 +47,7 @@ func main() {
 
 	var incomingIP net.IP = net.ParseIP(*anycastIP)
 
-	if incomingIP == nil {
+	if incomingIP == nil || *anycastIP == "1.2.3.4" {
 		fmt.Fprintf(errout, "Incorrect Anycast IP given")
 		flag.Usage()
 	}
