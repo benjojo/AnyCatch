@@ -88,7 +88,7 @@ func main() {
 				for level, headerr := range pkt.Headers {
 					switch header := headerr.(type) {
 					case *pcap.Icmphdr:
-						log.Printf("What(%d) ICMP! %d %d %d %d %d", level, *header.Type, *header.Code, *header.Checksum, *header.Id, *header.Seq)
+						log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
 					case *pcap.Iphdr:
 						//log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
 					default:
