@@ -86,7 +86,7 @@ func main() {
 				// 	Data     []byte
 				// }
 				icmppkt := pkt.Payload
-				icmp := new(gopcap.Icmphdr)
+				icmp := new(pcap.Icmphdr)
 				icmp.Type = icmppkt[0]
 				icmp.Code = icmppkt[1]
 				icmp.Checksum = binary.BigEndian.Uint16(icmppkt[2:4])
