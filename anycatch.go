@@ -97,7 +97,7 @@ func main() {
 					switch header := headerr.(type) {
 					case *pcap.Icmphdr:
 						if header.Type == 0 {
-							log.Printf("What(%d) ICMP! %s %d %d %d %d %d", level, pkt.IP.DestAddr(), header.Type, header.Code, header.Checksum, header.Id, header.Seq)
+							log.Printf("What(%d) ICMP! %s %d %d %d %d %d", level, pkt.IP.SrcAddr(), header.Type, header.Code, header.Checksum, header.Id, header.Seq)
 						}
 					case *pcap.Iphdr:
 						//log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
