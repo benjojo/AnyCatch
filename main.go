@@ -88,6 +88,8 @@ func main() {
 					switch header := headerr.(type) {
 					case pcap.Icmphdr:
 						log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
+					case pcap.Iphdr:
+						//log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
 					default:
 						log.Printf("Ahem %s ", headerr)
 					}
