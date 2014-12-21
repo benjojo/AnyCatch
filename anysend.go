@@ -9,7 +9,7 @@ import (
 
 func main() {
 	var anycastIP *string = flag.String("a", "1.2.3.4", "anycastip")
-	var targetIP *string = flag.String("a", "1.2.3.4", "targetIP")
+	var targetIP *string = flag.String("t", "1.2.3.4", "targetIP")
 
 	flag.Usage = func() {
 		log.Printf("usage: %s [ -i interface ] [ -a anycastip ] [ -s snaplen ] [ -X ] [ expression ]\n", os.Args[0])
