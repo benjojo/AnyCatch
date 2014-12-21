@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/binary"
 	"flag"
 	"fmt"
 	"github.com/akrennmair/gopcap"
@@ -85,8 +84,8 @@ func main() {
 				// 	Seq      uint16
 				// 	Data     []byte
 				// }
-				for level, header := range pkt.Headers {
-					switch header := value.(type) {
+				for level, headerr := range pkt.Headers {
+					switch header := headerr.(type) {
 					case pcap.Icmphdr:
 						log.Printf("What ICMP! %d %d %d %d %d", header.Type, header.Code, header.Checksum, header.Id, header.Seq)
 					}
