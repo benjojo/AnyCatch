@@ -81,7 +81,7 @@ func getChecksum(data []byte) (uint16, error) {
 	if err != nil {
 		return 0, err
 	}
-	arr := append(buf.Bytes(), data...)
+	arr := data
 
 	var sum uint32
 	countTo := (len(arr) / 2) * 2
