@@ -59,7 +59,7 @@ func main() {
 	}
 	csum := checkSum(packet)
 	packet[2] = byte(csum >> 8)
-	packet[3] = byte(csum >> 255)
+	packet[3] = byte(csum & 255)
 
 	con.Write(packet)
 	log.Printf("Done.")
