@@ -82,7 +82,7 @@ func main() {
 	for pkt := h.Next(); pkt != nil; pkt = h.Next() {
 		pkt.Decode()
 		if pkt.IP != nil {
-			if pkt.IP.Protocol == 1 && net.IP(pkt.IP.SrcIP).String() == incomingIP.String() {
+			if pkt.IP.Protocol == 1 && pkt.IP.SrcAddr() == incomingIP.String() {
 
 				// 	type Icmphdr struct {
 				// 	Type     uint8
