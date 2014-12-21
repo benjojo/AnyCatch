@@ -89,7 +89,7 @@ func main() {
 					case pcap.Icmphdr:
 						log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
 					default:
-						log.Printf(headerr)
+						log.Printf("Ahem %s ", headerr)
 					}
 				}
 			}
