@@ -82,7 +82,7 @@ func main() {
 	for pkt := h.Next(); pkt != nil; pkt = h.Next() {
 		pkt.Decode()
 		if pkt.IP != nil {
-			if pkt.IP.Protocol == 1 && pkt.IP.SrcAddr() == incomingIP.String() {
+			if pkt.IP.Protocol == 1 && pkt.IP.DstAddr() == incomingIP.String() {
 
 				// 	type Icmphdr struct {
 				// 	Type     uint8
@@ -96,8 +96,8 @@ func main() {
 				for level, headerr := range pkt.Headers {
 					switch header := headerr.(type) {
 					case *pcap.Icmphdr:
-						if header.Type == 8 {
-							log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
+						if header.Type == 0 {
+							log.Printf("What(%d) ICMP! %s %d %d %d %d %d", level, pkt.IP.SrcAddr(), header.Type, header.Code, header.Checksum, header.Id, header.Seq)
 						}
 					case *pcap.Iphdr:
 						//log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
