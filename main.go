@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/akrennmair/gopcap"
-	"github.com/oschwald/geoip2-golang"
 	"log"
 	"net"
 	"os"
@@ -26,11 +25,6 @@ var out *bufio.Writer
 var errout *bufio.Writer
 
 func main() {
-	db, err := geoip2.Open("GeoIP2-City.mmdb")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	var device *string = flag.String("i", "", "interface")
 	var snaplen *int = flag.Int("s", 65535, "snaplen")
@@ -80,13 +74,24 @@ func main() {
 	for pkt := h.Next(); pkt != nil; pkt = h.Next() {
 		pkt.Decode()
 		if pkt.IP != nil {
-			if pkt.IP.Protocol == 17 {
-				if pkt.UDP.DestPort == 48563 {
-					record, err := db.City(net.IP(pkt.IP.SrcIp))
-					if err == nil {
-						fmt.Fprintf(out, "%s | %f | %f\n", record.Country.Names["en"], record.Location.Latitude, record.Location.Longitude)
-					}
-				}
+			if pkt.IP.Protocol == 1 {
+
+				// 	type Icmphdr struct {
+				// 	Type     uint8
+				// 	Code     uint8
+				// 	Checksum uint16
+				// 	Id       uint16
+				// 	Seq      uint16
+				// 	Data     []byte
+				// }
+				icmppkt := pkt.Payload
+				icmp := new(Icmphdr)
+				icmp.Type = icmppkt[0]
+				icmp.Code = icmppkt[1]
+				icmp.Checksum = binary.BigEndian.Uint16(icmppkt[2:4])
+				icmp.Id = binary.BigEndian.Uint16(icmppkt[4:6])
+				icmp.Seq = binary.BigEndian.Uint16(icmppkt[6:8])
+				log.Printf("What ICMP! %d %d %d %d %d", icmp.Type, icmp.Code, icmp.Checksum, icmp.Id, icmp.Seq)
 			}
 		}
 		out.Flush()
