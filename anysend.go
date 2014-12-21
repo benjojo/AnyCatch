@@ -64,8 +64,11 @@ func main() {
 		packet[8+i] = payload[i]
 	}
 	csum, _ := getChecksum(packet)
-	packet[2] = byte(csum >> 8)
-	packet[3] = byte(csum & 255)
+
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.BigEndian, csum)
+	packet[2] = buf.Bytes()[0]
+	packet[3] = buf.Bytes()[1]
 
 	con.Write(packet)
 	log.Printf("Done.")
