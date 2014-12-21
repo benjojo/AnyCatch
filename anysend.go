@@ -22,8 +22,8 @@ func main() {
 		flag.Usage()
 	}
 
-	raddr := &net.IPAddr{IP: net.ParseIP(*anycastIP).To4()}
-	laddr := &net.IPAddr{IP: net.ParseIP(*targetIP)}
+	raddr := &net.IPAddr{IP: net.ParseIP(*targetIP).To4()}
+	laddr := &net.IPAddr{IP: net.ParseIP(*anycastIP)}
 
 	con, err := net.DialIP("ip4:1", laddr, raddr)
 	if err != nil {
