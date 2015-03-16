@@ -3,29 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
-	"flag"
 	"log"
 	"net"
-	"os"
 )
 
-func main() {
-	var anycastIP *string = flag.String("a", "1.2.3.4", "anycastip")
-	var targetIP *string = flag.String("t", "1.2.3.4", "targetIP")
-
-	flag.Usage = func() {
-		log.Printf("usage: %s [ -i interface ] [ -a anycastip ] [ -s snaplen ] [ -X ] [ expression ]\n", os.Args[0])
-		os.Exit(1)
-	}
-
-	flag.Parse()
-
-	if *anycastIP == "1.2.3.4" || *targetIP == "1.2.3.4" {
-		flag.Usage()
-	}
-
-	raddr := &net.IPAddr{IP: net.ParseIP(*targetIP).To4()}
-	laddr := &net.IPAddr{IP: net.ParseIP(*anycastIP)}
+func SendPingPacket(Target, AnyIP string) {
+	raddr := &net.IPAddr{IP: net.ParseIP(Target).To4()}
+	laddr := &net.IPAddr{IP: net.ParseIP(AnyIP)}
 
 	con, err := net.DialIP("ip4:1", laddr, raddr)
 	if err != nil {
