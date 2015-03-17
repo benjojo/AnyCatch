@@ -7,7 +7,12 @@ import (
 	"net"
 )
 
-func SendPingPacket(Target, AnyIP string) {
+func SendPingPacket(Target, AnyIP, Payload string) {
+	if len(Payload) != 8 {
+		log.Printf("Bad payload request")
+		return
+	}
+
 	raddr := &net.IPAddr{IP: net.ParseIP(Target).To4()}
 	laddr := &net.IPAddr{IP: net.ParseIP(AnyIP)}
 

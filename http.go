@@ -6,15 +6,15 @@ import (
 	"net/http"
 )
 
-func StartServer() {
+func StartServer(password string) {
 	m := martini.Classic()
 	m.Get("/Get", LastPings)
-	m.Get("/Send/:ip", SendPing)
+	m.Get("/Send/:ip/:token", SendPing)
 
 	m.Use(func(res http.ResponseWriter, req *http.Request) {
-		// if req.Header.Get("X-API-KEY") != "secret123" {
-		// res.WriteHeader(http.StatusUnauthorized)
-		// }
+		if req.Header.Get("X-API-KEY") != password {
+			res.WriteHeader(http.StatusUnauthorized)
+		}
 	})
 
 	// m.Run()
@@ -22,7 +22,7 @@ func StartServer() {
 }
 
 func SendPing(rw http.ResponseWriter, req *http.Request, params martini.Params) {
-	SendPingPacket(params["ip"], AnycastIP)
+	SendPingPacket(params["ip"], AnycastIP, params["token"])
 }
 
 func LastPings(rw http.ResponseWriter, req *http.Request) {

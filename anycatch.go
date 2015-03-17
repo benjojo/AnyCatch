@@ -75,7 +75,7 @@ func StartListeningForPings(device, anycastIP string, snaplen int) {
 					case *pcap.Icmphdr:
 						if header.Type == 0 {
 							log.Printf("What(%d) ICMP! %s %d %d %d %d %d", level, pkt.IP.SrcAddr(), header.Type, header.Code, header.Checksum, header.Id, header.Seq)
-							LogPing(pkt.IP.SrcAddr())
+							LogPing(string(header.Data))
 						}
 					case *pcap.Iphdr:
 						//log.Printf("What(%d) ICMP! %d %d %d %d %d", level, header.Type, header.Code, header.Checksum, header.Id, header.Seq)
