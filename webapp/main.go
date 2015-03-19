@@ -62,17 +62,23 @@ type Worker struct {
 	Longitude float64
 }
 
+var db *maxminddb.Reader
+var dbloaded bool = false
+
 func SendOutPings(rw http.ResponseWriter, req *http.Request, params martini.Params) string {
 
 	c := appengine.NewContext(req)
 
 	SendBack := Results{}
-
-	db, err := maxminddb.OpenGzip("GeoLite2-City.mmdb.gz")
-	if err != nil {
-		http.Error(rw, fmt.Sprintf("Error reading geoip db: %s", err), http.StatusInternalServerError)
+	if !dbloaded {
+		var err error
+		db, err = maxminddb.OpenGzip("GeoLite2-City.mmdb.gz")
+		if err != nil {
+			http.Error(rw, fmt.Sprintf("Error reading geoip db: %s", err), http.StatusInternalServerError)
+		}
+		dbloaded = true
 	}
-	defer db.Close()
+
 	ip := net.ParseIP(params["ip"]).To4()
 
 	if ip == nil {
