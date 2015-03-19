@@ -34,7 +34,7 @@ func SendPingPacket(Target, AnyIP, Payload string) {
 	// p.Headers = append(p.Headers, icmp)
 	// return icmp
 
-	payload := []byte("ANYCATCH")
+	payload := []byte(Payload)
 	packet := make([]byte, 7+len(payload)+1) // 7 for the packet itself, 8 for the "ANYCATCH" string
 
 	packet[0] = 8 // Type, in this case a echo request

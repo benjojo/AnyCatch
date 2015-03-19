@@ -12,9 +12,9 @@ func StartServer(password string) {
 	m.Get("/Send/:ip/:token", SendPing)
 
 	m.Use(func(res http.ResponseWriter, req *http.Request) {
-		if req.Header.Get("X-API-KEY") != password {
-			res.WriteHeader(http.StatusUnauthorized)
-		}
+		//if req.Header.Get("X-API-KEY") != password {
+		//	res.WriteHeader(http.StatusUnauthorized)
+		//}
 	})
 
 	// m.Run()
