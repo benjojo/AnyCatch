@@ -31,14 +31,16 @@ type Results struct {
 		Lati float64 `json:"lati"`
 		Long float64 `json:"long"`
 	} `json:"geoip"`
-	Hit struct {
-		Geoip struct {
-			Lati float64 `json:"lati"`
-			Long float64 `json:"long"`
-		} `json:"geoip"`
-		Name string `json:"name"`
-	} `json:"hit"`
-	Ip string `json:"ip"`
+	Hits []ServerHit `json:"hit"`
+	Ip   string      `json:"ip"`
+}
+
+type ServerHit struct {
+	Geoip struct {
+		Lati float64 `json:"lati"`
+		Long float64 `json:"long"`
+	} `json:"geoip"`
+	Name string `json:"name"`
 }
 
 type GeoIPCity struct {
@@ -90,7 +92,7 @@ func SendOutPings(rw http.ResponseWriter, req *http.Request, params martini.Para
 
 	SendBack.Geoip.Lati = GIP.Location.Latitude
 	SendBack.Geoip.Long = GIP.Location.Longitude
-
+	SendBack.Hits = make([]ServerHit, 0)
 	workers := []Worker{
 		{Name: "storm", URL: "storm.benjojo.co.uk:2374", Latitude: 33.9425, Longitude: -118.4080},
 		{Name: "belle", URL: "belle.benjojo.co.uk:2374", Latitude: 40.6397, Longitude: -73.7788},
@@ -117,7 +119,8 @@ func SendOutPings(rw http.ResponseWriter, req *http.Request, params martini.Para
 		client := urlfetch.Client(c)
 		re, err := client.Get(fmt.Sprintf("http://%s/Get", v.URL))
 		if err != nil {
-			continue
+			http.Error(rw, fmt.Sprintf("Cannot contact worker %s", err), http.StatusInternalServerError)
+			return ""
 		}
 		bytes, err := ioutil.ReadAll(re.Body)
 		if err != nil {
@@ -126,12 +129,15 @@ func SendOutPings(rw http.ResponseWriter, req *http.Request, params martini.Para
 		tokens := make([]string, 0)
 		json.Unmarshal(bytes, &tokens)
 		if Contains(tokens, token) {
-			SendBack.Hit.Name = v.Name
-			SendBack.Hit.Geoip.Lati = v.Latitude
-			SendBack.Hit.Geoip.Long = v.Longitude
-			break
+			SB := ServerHit{}
+			SB.Name = v.Name
+			SB.Geoip.Lati = v.Latitude
+			SB.Geoip.Long = v.Longitude
+			SendBack.Hits = append(SendBack.Hits, SB)
 		}
 	}
+
+	SendBack.Ip = params["ip"]
 
 	output, _ := json.Marshal(SendBack)
 	return string(output)
