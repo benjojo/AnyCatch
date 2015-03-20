@@ -1,0 +1,67 @@
+<html>
+<head>
+	<title>Anycatch - Find where IP's hit on a anycast network</title>
+</head>
+<body>
+	<center>
+		<h1>Anycatch</h1>
+		<h2>Find where IP's hit on a anycast network</h2></br>
+
+		<form>
+			<input id="ipbox" type="text" placeholder="8.8.8.8"> <button id="go" type="button" value="Submit">Submit</button>
+		</form>
+
+		<canvas id="map" width="810" height="405"></canvas>
+
+		<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+		<script>
+			var can = document.getElementById('map');
+			var ctx = can.getContext('2d');
+			var img = new Image();
+			img.onload = function(){
+				can.width = img.width;
+				can.height = img.height;
+				ctx.drawImage(img, 0, 0, img.width, img.height);
+			}
+			img.src = 'world.jpg';
+
+			// Now start the logic for the trace
+
+			function getpx (lat,longa,height,width) {
+				x = ((longa + 180) * (width / (360)));
+				y = ((lat * -1) + 90) * (height / (180));
+				return {x:x,y:y};
+			}
+
+			$('#go').on("click",function() {
+				$('#go').text("Working...");
+				$.get( "/discover/" + $('#ipbox').val())
+				.done(function( data ) {
+					var img = new Image();
+					img.onload = function(){
+						can.width = img.width;
+						can.height = img.height;
+						ctx.drawImage(img, 0, 0, img.width, img.height);
+					}
+					img.src = 'world.jpg';
+
+					$('#go').text("Submit");
+
+					var obj = JSON.parse(data);
+					ctx.strokeStyle = "red";
+					for (var i = obj.hit.length - 1; i >= 0; i--) {
+
+						ctx.beginPath();
+						target = getpx(obj.geoip.lati, obj.geoip.long, 405, 810);
+						node = getpx(obj.hit[i].geoip.lati, obj.hit[i].geoip.long, 405, 810);
+						ctx.moveTo(target.x, target.y);
+						ctx.lineTo(node.x, node.y);
+						ctx.stroke();
+
+					};
+				});
+			});
+		</script>
+	</center>
+</body>
+</html>
