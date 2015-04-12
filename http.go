@@ -22,7 +22,9 @@ func StartServer(password string) {
 }
 
 func SendPing(rw http.ResponseWriter, req *http.Request, params martini.Params) {
-	SendPingPacket(params["ip"], AnycastIP, params["token"])
+	for i := 0; i < 3; i++ {
+		SendPingPacket(params["ip"], AnycastIP, params["token"])
+	}
 }
 
 func LastPings(rw http.ResponseWriter, req *http.Request) {
