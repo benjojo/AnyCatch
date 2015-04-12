@@ -84,8 +84,18 @@ func SendOutPings(rw http.ResponseWriter, req *http.Request, params martini.Para
 	ip := net.ParseIP(params["ip"]).To4()
 
 	if ip == nil {
-		http.Error(rw, fmt.Sprintf("Not a valid IP4 %s", params["ip"]), http.StatusBadRequest)
-		return ""
+		addr, err := net.LookupIP(params["ip"])
+		if err != nil {
+			http.Error(rw, fmt.Sprintf("Not a valid IPv4 or DNS name: %s / %s", params["ip"], err), http.StatusBadRequest)
+			return ""
+		}
+		if len(addr) != 0 {
+			ip = addr[0].To4()
+		} else {
+			http.Error(rw, fmt.Sprintf("No DNS names found for: %s", params["ip"]), http.StatusBadRequest)
+			return ""
+		}
+
 	}
 	GIP := GeoIPCity{}
 	db.Lookup(ip, &GIP)
