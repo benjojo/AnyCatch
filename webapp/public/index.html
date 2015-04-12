@@ -7,9 +7,9 @@
 		<h1>Anycatch</h1>
 		<h2>Find where IP's hit on a anycast network</h2></br>
 
-		<form>
-			<input id="ipbox" type="text" placeholder="8.8.8.8"> <button id="go" type="button" value="Submit">Submit</button>
-		</form>
+		
+		<input id="ipbox" type="text" placeholder="8.8.8.8"> <button id="go" type="button" value="Submit">Submit</button>
+		</br>
 
 		<canvas id="map" width="810" height="405"></canvas>
 
@@ -34,47 +34,61 @@
 			}
 
 			$('#go').on("click",function() {
+				DoAnyCastQueryLogic();
+			});
+
+			$('#ipbox').keyup(function(e){
+				if(e.keyCode == 13) {
+					DoAnyCastQueryLogic();
+					e.preventDefault();
+					return false;
+				}
+			});
+
+			function DoAnyCastQueryLogic (argument) {
 				$('#go').text("Working...");
 				$.get( "/discover/" + $('#ipbox').val())
 				.done(function( data ) {
 					var img = new Image();
 					img.onload = function(){
+						$('#go').text("Submit");
 						can.width = img.width;
 						can.height = img.height;
 						ctx.drawImage(img, 0, 0, img.width, img.height);
+						// Well now we have that in order.
+
+						var obj = JSON.parse(data);
+
+						$('#extrainfo').empty();
+						if(obj.hit.length > 1) {
+							$('#extrainfo').append("<h1>AnyCast IP detected</h1></br>");
+						}
+
+						ctx.strokeStyle = "#FF0000";
+						for (var i = obj.hit.length - 1; i >= 0; i--) {
+							if(obj.hit[i].name == "flora") {
+								ctx.strokeStyle = "#86C1B9";
+							} else if (obj.hit[i].name == "belle"){
+								ctx.strokeStyle = "#BA8BAF";
+							} else if (obj.hit[i].name == "storm"){
+								ctx.strokeStyle = "#DC9656";
+							}
+							ctx.lineWidth = 5;
+							ctx.beginPath();
+							target = getpx(obj.geoip.lati, obj.geoip.long, 405, 810);
+							node = getpx(obj.hit[i].geoip.lati, obj.hit[i].geoip.long, 405, 810);
+							ctx.moveTo(target.x, target.y);
+							ctx.lineTo(node.x, node.y);
+							ctx.stroke();
+							$('#extrainfo').append("<h2>Hit seen on "+obj.hit[i].name+"</h2>");
+						};
+
 					}
 					img.src = 'world.jpg';
 
-					$('#go').text("Submit");
-
-					var obj = JSON.parse(data);
-
-					$('#extrainfo').empty();
-					if(obj.hit.length > 1) {
-						$('#extrainfo').append("<h1>AnyCast IP detected</h1></br>");
-					}
-
-					ctx.strokeStyle = "#FF0000";
-					for (var i = obj.hit.length - 1; i >= 0; i--) {
-						if(obj.hit[i].name == "flora") {
-							ctx.strokeStyle = "#86C1B9";
-						} else if (obj.hit[i].name == "belle"){
-							ctx.strokeStyle = "#BA8BAF";
-						} else if (obj.hit[i].name == "storm"){
-							ctx.strokeStyle = "#DC9656";
-						}
-						ctx.lineWidth = 5;
-						ctx.beginPath();
-						target = getpx(obj.geoip.lati, obj.geoip.long, 405, 810);
-						node = getpx(obj.hit[i].geoip.lati, obj.hit[i].geoip.long, 405, 810);
-						ctx.moveTo(target.x, target.y);
-						ctx.lineTo(node.x, node.y);
-						ctx.stroke();
-						$('#extrainfo').append("<h2>Hit seen on "+obj.hit[i].name+"</h2></br>");
-					};
 
 				});
-			});
+			}
 		</script>
 
 		<div id="extrainfo">
