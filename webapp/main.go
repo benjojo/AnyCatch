@@ -113,12 +113,14 @@ func SendOutPings(rw http.ResponseWriter, req *http.Request, params martini.Para
 	for _, v := range workers {
 
 		client := urlfetch.Client(c)
-		re, err := client.Get(fmt.Sprintf("http://%s/Send/%s/%s", v.URL, params["ip"], token))
+		req, _ := http.NewRequest("GET", fmt.Sprintf("http://%s/Send/%s/%s", v.URL, params["ip"], token), nil)
+		req.Header.Add("X-API-KEY", WorkerPassword)
+		res, err := client.Do(req)
 		if err != nil {
 			http.Error(rw, fmt.Sprintf("Cannot contact worker %s", err), http.StatusInternalServerError)
 			return ""
 		}
-		if re.StatusCode != 200 {
+		if res.StatusCode != 200 {
 			continue
 		}
 	}
