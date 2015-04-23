@@ -131,6 +131,7 @@ func SendOutPings(rw http.ResponseWriter, req *http.Request, params martini.Para
 		client := urlfetch.Client(c)
 		req, err := http.NewRequest("GET", fmt.Sprintf("http://%s/Get", v.URL), nil)
 		req.Header.Add("Cache-Control", `max-age=0, must-revalidate`)
+		req.Header.Add("X-API-KEY", WorkerPassword)
 		re, err := client.Do(req)
 
 		if err != nil {
