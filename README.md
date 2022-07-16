@@ -6,8 +6,8 @@ One of the interesting things is that a computer cannot really tell (unless it h
 
 <h3>Anycast primer</h3>
 
-Before I start this, I just want to go though what a anycast actually is.
-Most programmers who have done networking have heard the comparison between a IP address and a telephone number, if you want to explain the idea of a anycast IP address to someone, I believe that the most simple way is to explain that if your computer is `34.24.77.2` (not my IP, not even routable) and lets say the direct translation to a phone number was `0121 441 526` and a anycast IP was `3.22.51.1`. Then its phone number would be like that of `999` (For Americans `911`, Other EU places `112`)
+Before I start this, I just want to go though what an anycast actually is.
+Most programmers who have done networking have heard the comparison between a IP address and a telephone number, if you want to explain the idea of an anycast IP address to someone, I believe that the most simple way is to explain that if your computer is `34.24.77.2` (not my IP, not even routable) and lets say the direct translation to a phone number was `0121 441 526` and an anycast IP was `3.22.51.1`. Then its phone number would be like that of `999` (For Americans `911`, Other EU places `112`)
 This kind of number is the "anycast" of telephone systems, because that phone number will be directed to the most *preferable* (hopefully the closest) call center in your region, this is why if I was to dial `999` in London, I would most likely be sent to a call center in London to take my emergency call, rather to one in Scotland.
 Networks do the same thing basically.
 Here is a small drawing of a network setup:
@@ -46,14 +46,14 @@ HOST: Spitfire Loss% Snt Last Avg Best Wrst StDev
 ```
 
 Notice on both of those servers, the round trip time is less than 10ms on each? Now unless routers have invented electron teleportation (the bare minimum time in a single direction to get from those two servers is [42ms](http://www.wolframalpha.com/input/?i=distance+between+LAX+and+AMS)) this is an anycast address
-<h3>Discovery of users destination in regards to a anycast IP</h3>
+<h3>Discovery of users destination in regards to an anycast IP</h3>
 This is normally a hard task for providers who use anycast, since you cannot guess where providers are going to route, since you cannot see their routing table or how their routers are configured in terms of what they have their metrics set to. They can only assume, For example “French IP addresses will hit the French announcement of the IP address”.
 This is not always true, this is amplified more in regions of bad connectivity that have lesser connectivity than other regions, because they will end up buying off carriers that go direct to regions like Europe and North America where connectivity is better.
-Where a user ends up if they try and contact a anycast IP depends on who their ISP is buying their greater connectivity off.
-However, The provider can use their own anycast network to test where the user will end up, assuming that the target replys back when sent something (ICMP Echo, TCP SYN) you can listen back for the response. You don’t need to worry about where on the anycast network you send the probe, all you need to do is listen back for the response.
-This works fine, as long as the target itself not a anycast address (and you can detect that as I have written above, by sending out from many nodes at once and seeing if the responses land back at different places)
+Where a user ends up if they try and contact an anycast IP depends on who their ISP is buying their greater connectivity off.
+However, The provider can use their own anycast network to test where the user will end up, assuming that the target replies back when sent something (ICMP Echo, TCP SYN) you can listen back for the response. You don’t need to worry about where on the anycast network you send the probe, all you need to do is listen back for the response.
+This works fine, as long as the target itself not an anycast address (and you can detect that as I have written above, by sending out from many nodes at once and seeing if the responses land back at different places)
 <h3>PoC</h3>
-I have a set of 3 servers (One on West Coast USA, East Coast USA, and one in Luxembourg, EU) that are setup to be any casted, and have assembled a anycast network out of the three servers.
+I have a set of 3 servers (One on West Coast USA, East Coast USA, and one in Luxembourg, EU) that are setup to be any casted, and have assembled an anycast network out of the three servers.
 Here is it detecting an anycast IP:
 
 ![anycast detection](https://blog.benjojo.co.uk/asset/6KqFDdwCqr)
@@ -72,5 +72,5 @@ and finally the BBC:
 ![BBC](https://blog.benjojo.co.uk/asset/gECqxEup0S)
 
 Want to try the tool out for yourself? You can find mine here: https://anycatch.benjojo.co.uk
-Or if you want to build your own in the case that you have a anycast network infra of your own, You can find the code here: https://github.com/benjojo/AnyCatch
+Or if you want to build your own in the case that you have an anycast network infra of your own, You can find the code here: https://github.com/benjojo/AnyCatch
 If you are using it, or find anything interesting with my own tool, Do let me know!
